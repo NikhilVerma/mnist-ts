@@ -1,26 +1,23 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Uint8ClampedArrayCanvas from "./components/Uint8ClampedArrayCanvas.vue";
-import { parseIdx1File, parseIdx3File } from "./utils";
+import { testDataPromise } from "./utils";
 
-const testImages = ref<Uint8ClampedArray[]>([]);
-const testLabels = ref<Uint8ClampedArray>();
+const testImagesProp = ref<Uint8ClampedArray[]>([]);
+const testLabelsProp = ref<Uint8ClampedArray>();
 
 onMounted(async () => {
-    const testImagesResponse = await fetch("/t10k-images-idx3-ubyte");
-    const testLabelsResponse = await fetch("/t10k-labels-idx1-ubyte");
-    // images.value = parseIdx3File(arrayBuf).slice(0, 10);
-    // testImages.value = parseIdx3File(await testImagesResponse.arrayBuffer());
-    testImages.value = parseIdx3File(await testImagesResponse.arrayBuffer()).slice(0, 10);
-    testLabels.value = parseIdx1File(await testLabelsResponse.arrayBuffer());
+    const { testImages, testLabels } = await testDataPromise;
+    testImagesProp.value = testImages.slice(0, 10);
+    testLabelsProp.value = testLabels;
 });
 </script>
 
 <template>
     <Uint8ClampedArrayCanvas
-        v-for="(image, idx) in testImages"
+        v-for="(image, idx) in testImagesProp"
         :key="idx"
         :image="image"
-        :label="testLabels?.[idx]"
+        :label="testLabelsProp?.[idx]"
     />
 </template>
